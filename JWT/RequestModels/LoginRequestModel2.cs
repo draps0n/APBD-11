@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace JWT.RequestModels;
 
-public class LoginRequestModel
+public class LoginRequestModel2
 {
     [Required] public string Username { get; set; }
 

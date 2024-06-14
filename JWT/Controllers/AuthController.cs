@@ -39,7 +39,7 @@ public class AuthController(IAppUserService appUserService, IConfiguration confi
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> LoginAppUser([FromBody] LoginRequestModel requestModel)
+    public async Task<IActionResult> LoginAppUser([FromBody] LoginRequestModel2 requestModel)
     {
         var user = await appUserService.GetUserByUsernameAsync(requestModel.Username);
 
@@ -99,7 +99,7 @@ public class AuthController(IAppUserService appUserService, IConfiguration confi
         {
             user = await appUserService.GetUserByIdAsync(userId);
         }
-        catch (UnauthorizedException e)
+        catch (UnauthorizedException)
         {
             return Unauthorized("Invalid token");
         }
