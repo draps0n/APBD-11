@@ -17,7 +17,7 @@ namespace JWT.Controllers;
 [Route("api/auth")]
 public class AuthController(IAppUserService appUserService, IConfiguration configuration) : ControllerBase
 {
-    [HttpPost("/register")]
+    [HttpPost("register")]
     public async Task<IActionResult> RegisterNewAppUser([FromBody] RegisterRequestModel requestModel)
     {
         var hashedPasswordAndSalt = SecurityHelpers.GetHashedPasswordAndSalt(requestModel.Password);
@@ -38,7 +38,7 @@ public class AuthController(IAppUserService appUserService, IConfiguration confi
         return StatusCode(201);
     }
 
-    [HttpPost("/login")]
+    [HttpPost("login")]
     public async Task<IActionResult> LoginAppUser([FromBody] LoginRequestModel requestModel)
     {
         var user = await appUserService.GetUserByUsernameAsync(requestModel.Username);
@@ -90,7 +90,8 @@ public class AuthController(IAppUserService appUserService, IConfiguration confi
     }
 
     [Authorize(AuthenticationSchemes = "IgnoreTokenExpirationScheme")]
-    public async Task<IActionResult> Refresh(RequestModels.RefreshTokenRequestModel requestModel)
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh(RefreshTokenRequestModel2 requestModel2)
     {
         var userId = IntegerType.FromString(User.FindFirstValue(ClaimTypes.NameIdentifier));
         AppUser user;
@@ -106,7 +107,7 @@ public class AuthController(IAppUserService appUserService, IConfiguration confi
         var tokenHandler = new JwtSecurityTokenHandler();
         try
         {
-            tokenHandler.ValidateToken(requestModel.RefreshToken, new TokenValidationParameters
+            tokenHandler.ValidateToken(requestModel2.RefreshToken, new TokenValidationParameters
             {
                 ValidateIssuer = true,
                 ValidateAudience = true,
@@ -155,5 +156,12 @@ public class AuthController(IAppUserService appUserService, IConfiguration confi
             Token = stringToken,
             RefreshToken = stringRefToken
         });
+    }
+
+    [HttpGet("secret-data")]
+    [Authorize]
+    public IActionResult GetSecretData()
+    {
+        return Ok("Kocham PJATK!");
     }
 }
