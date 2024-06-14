@@ -91,7 +91,7 @@ public class AuthController(IAppUserService appUserService, IConfiguration confi
 
     [Authorize(AuthenticationSchemes = "IgnoreTokenExpirationScheme")]
     [HttpPost("refresh")]
-    public async Task<IActionResult> Refresh(RefreshTokenRequestModel2 requestModel2)
+    public async Task<IActionResult> Refresh(RefreshTokenRequestModel2 requestModel)
     {
         var userId = IntegerType.FromString(User.FindFirstValue(ClaimTypes.NameIdentifier));
         AppUser user;
@@ -101,13 +101,13 @@ public class AuthController(IAppUserService appUserService, IConfiguration confi
         }
         catch (UnauthorizedException e)
         {
-            return Unauthorized(e.Message);
+            return Unauthorized("Invalid token");
         }
 
         var tokenHandler = new JwtSecurityTokenHandler();
         try
         {
-            tokenHandler.ValidateToken(requestModel2.RefreshToken, new TokenValidationParameters
+            tokenHandler.ValidateToken(requestModel.RefreshToken, new TokenValidationParameters
             {
                 ValidateIssuer = true,
                 ValidateAudience = true,
@@ -120,7 +120,7 @@ public class AuthController(IAppUserService appUserService, IConfiguration confi
         }
         catch
         {
-            return Unauthorized();
+            return Unauthorized("Invalid token");
         }
 
         var tokenDescription = new SecurityTokenDescriptor
